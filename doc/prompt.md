@@ -1,7 +1,7 @@
 # Photo Organizer prompt
 
 Photo Organizer is a CLI utility written in Python,
-it organizes JPG files by EXIF date into direcetories.
+it organizes JPG files into directories by EXIF stamp.
 
 The utility is 99.99% made by AI.
 
