@@ -1,5 +1,10 @@
 # Photo Organizer prompt
 
+Photo Organizer is a CLI utility written in Python,
+it organizes JPG files by EXIF date into direcetories.
+
+The utility is 99.99% made by AI.
+
 ## Claude Sonnet 4.5
 
 ### Initial prompt
@@ -77,4 +82,18 @@ print summary at the end, not before deleting
 
 ```
 refactor, split program into functions
+```
+
+### Handmade changes
+
+Removed line break from separator logging.
+
+Before:
+```
+  logging.info(f"\n{'='*50}")
+```
+
+After:
+```
+  logging.info(f"{'='*50}")
 ```
