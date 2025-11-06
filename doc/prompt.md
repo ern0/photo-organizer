@@ -3,7 +3,7 @@
 Photo Organizer is a CLI utility written in Python,
 it organizes JPG files into directories by EXIF stamp.
 
-The utility is 99.99% made by AI.
+The utility is 100% made by AI.
 
 > There are more versions.
 
@@ -11,7 +11,15 @@ The utility is 99.99% made by AI.
 
 Second version with single prompt.
 
-New feature: keep description elements in directory name.
+New features:
+- keep description elements in directory name,
+- move non-image files,
+- sophisticated date detection,
+- delete of trash, thumbnail etc. images,
+- ignore list arg,
+- rename wrong filenames,
+- skip empty dirs,
+- fix my personal quirky naming conventions.
 
 ### Prompt
 
@@ -19,54 +27,97 @@ New feature: keep description elements in directory name.
 Create photo organizer program in Python3.
 
 Command line args:
- -s: root source directory,
- -t: root target directory,
- -f: date filter,
- -d: dry run
- -l: log file name.
- Add long arg versions.
+ -s, --source: root source path,
+ -t, --target: root target path,
+ -f, --filter: date filter,
+ -d, --dry-run: dry run
+ -l, --log: log file name
+ -i, --ignore-list: ignored directory list
 
-Take recursively all *.jpg files from the specified source directory,
-and move it to the photo target directory.
-If the photo target directory does not exists, create it.
-If the root target directory does not exists, create it.
+Process root source path recursively and
+process directories which have subdirectories or contains least one
+JPG or GIF or PNG or BMP or PDF or WAV or MP3 or AVI or MOV or MPG or 3GP or M4V or MP4 file.
 
-Strip leading "DCIM-" from source directory name.
-If the photo source directory or its parent directory contains a date YYYYMMDD or YYYY-MM-DD, or followed by a letter, use it unchanged,
-create target directory under YYYY/ with same name.
-Else if the photo has EXIF data, crate target under YYYY/ directory named YYYY-MM-DD.
-Else use photo creation date YYYY-MM-DD, use as target directory name and put under YYYY/
-Strip leading "DCIM-" from target directory name.
+If the directory is in the ignore list, ignore it.
+Ignore list is specified by command line arg -i.
 
-If the photo name starts with '-' rename it to "img-YYYYMMDD-hhmmss"
-using EXIF timestamp.
+Process each file.
+If the photo date is older than specified date filter, skip it.
+If filename is "Thumbs.db" or ".DS_Store", skip it and delete source file.
+If filename begins with ".trashed" or "._", skip it and delete source file.
+If filename extension is ".EXE" or ".DLL", skip it and delete source file.
+
+Use get_official_dir_name() method to get target directory.
+Target path is YYYY/ and target directory name.
+
+If the root target path not exists, create it.
+If the photo target path not exists, create it.
+
+If the photo name starts with '-'
+or contains only more than 15 numbers,
+rename it to "img-YYYYMMDD-hhmmss" using EXIF timestamp.
+Move JPG file to the photo target directory.
+Move all other files from source directory to the target path.
+If the file exist with same name and same size, overwrite it,
+else rename to a unique name.
 
 If the photo source directory is empty after file move,
 delete the photo source directory.
 If the root source directory is empty after file move,
 delete the root source directory.
 
-If the photo date is older than specified date filter, skip it.
-
 If the dry run arg is specified, do not perform, only log.
 
-Use log file to log all directory creation, file move, directory delete.
+Use log file to log all
+skip, directory creation, file move, rename, directory delete.
+Include source and target path in log messages.
 Delete old log file, if any.
 If no log file specified print on console.
-Do not add "\n" to log messages.
 Do not add loglevel and timestamp to log messages, only raw lines.
+Do not use logger library.
 
-At the end of program, create a statistics about operations.
+At the end of program, create a statistics.
+Count
+source directories processed,
+source directories skipped,
+source directories deleted,
+files moved with name unchanged,
+files moved with changed name,
+source files skipped,
+source files deleted.
 
 Use argparse with no color.
 Organize the program in a class.
 Split the program to methods.
 Add shebang.
+Use PIL for exif reading.
+
+Write get_official_dir_name() method.
+Parameter is full path to filename.
+Split it by '/', remove last piece.
+Strip leading "DCIM-" from all pieces.
+Take all pieces.
+If piece starts with YYYYMMDD,
+return with the piece.
+If piece starts with YYYY-MM-DD,
+replace YYYY-MM-DD with YYYYMMDD and return with the piece.
+If piece starts with YYYY-nodate,
+return with the piece.
+If no piece match,
+return exif date of parameter filename in YYYYMMDD format.
 ```
 
 ### Handmade changes
 
-TODO
+No handmade changes made.
+
+The prompt is more verbose:
+
+- Without `get_official_dir_name()` specified separately,
+  the LLM was ubable to create proper handling of dates.
+- Had to force to use PIL for EXIF parsing, sometimes
+  used other libs not installed on my system.
+- Listed extensions to include, and patterns to exclude.
 
 ## V1: Claude Sonnet 4.5
 
